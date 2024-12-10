@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Bus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            /* Color Palette */
+            --primary-color: #3b82f6;
+            --secondary-color: #10b981;
+            --background-color: #f5f5f7;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 430px;
+            margin: 0 auto;
+            height: 100vh;
+            background: var(--white);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Header Styles */
+        .header {
+            padding: 1rem;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .back-button:hover {
+            color: var(--primary-color);
+        }
+
+        .title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Search Container */
+        .search-container {
+            padding: 1rem;
+            background: var(--white);
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 0.9rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--background-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Map Container */
+        .map-container {
+            flex: 1;
+            background-color: #e5f2f7;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            margin: 0 1rem;
+        }
+
+        .map-controls {
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .map-button {
+            width: 45px;
+            height: 45px;
+            background: var(--white);
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .map-button:hover {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* Bottom Sheet */
+        .bottom-sheet {
+            background: var(--white);
+            border-radius: 20px 20px 0 0;
+            padding: 1.5rem;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 70%;
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .eta {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .stop-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: var(--background-color);
+            padding: 1rem;
+            border-radius: 12px;
+        }
+
+        .stop-icon {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .stop-details h3 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+            color: var(--text-primary);
+        }
+
+        .stop-details p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .time-icon {
+            margin-left: auto;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .call-button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+        }
+
+        .call-button:hover {
+            background: #2563eb;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 16px;
+            background-color: var(--white);
+            border-top: 1px solid var(--border-color);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 430px;
+            margin: 0 auto;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+
+        .progress-container {
+            position: relative;
+        }
+
+        .route-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .route-progress-bus {
+            color: #3b82f6;
+            font-size: 1.2rem;
+            background-color: rgba(59, 130, 246, 0.1);
+            padding: 0.3rem;
+            border-radius: 50%;
+        }
+
+        .route-text {
+            font-weight: 500;
+        }
+
+        .progress-bar-container {
+            position: relative;
+        }
+
+        .progress-bar {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: visible;
+        }
+
+        .progress-fill {
+            width: 70%;
+            height: 100%;
+            background: #3b82f6;
+            border-radius: 3px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .route-markers {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .route-marker {
+            width: 12px;
+            height: 12px;
+            background: #e5e7eb;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .route-marker.active {
+            background: #3b82f6;    
+        }
+
+        .route-marker.start {
+            margin-left: -6px;
+        }
+
+        .route-marker.end {
+            margin-right: -6px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-height: 700px) {
+            .container {
+                height: auto;
+                min-height: 100vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="./home.html" class="back-button" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="title">Track <span id="transportType">bus</span></h1>
+        </header>
+
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-bar" placeholder="Search">
+        </div>
+
+        <div class="map-container">
+            <!-- Map would be integrated here -->
+            <div class="map-controls">
+                <button class="map-button">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="map-button">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="map-button">
+                    <i class="fas fa-compass"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="bottom-sheet">
+            <div class="progress-container">
+                <div class="progress-header">
+                    <div class="route-info">
+                        <i class="fas fa-bus route-progress-bus"></i>
+                        <span class="route-text">Route Progress</span>
+                    </div>
+                    <span class="progress-percentage">70%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                        <div class="route-markers">
+                            <div class="route-marker start active"></div>
+                            <div class="route-marker mid"></div>
+                            <div class="route-marker end"></div>
+                        </div>
+                    </div>
+                </div>
+                <p class="eta">ETA 3:20 PM</p>
+            </div>
+
+
+            <div class="stop-info">
+                <i class="fas fa-bus stop-icon"></i>
+                <div class="stop-details">
+                    <h3>Stop 6</h3>
+                    <p>Arriving 2:45 PM</p>
+                </div>
+                <i class="far fa-clock time-icon"></i>
+            </div>
+
+            <button class="call-button">Call driver</button>
+        </div>
+
+        <nav class="bottom-nav">
+            <a href="./home.html" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item active">
+                <i class="fas fa-map-marked-alt nav-icon"></i>
+                <span>Trips</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-user nav-icon"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Get the transport type from the URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const transportType = urlParams.get('type') || 'bus';
+
+        // Update the title with the correct transport type
+        document.getElementById('transportType').textContent = transportType;
+
+        // Update the icon based on the transport type
+        const stopIcon = document.querySelector('.stop-icon');
+        switch (transportType) {
+            case 'train':
+                stopIcon.classList.remove('fa-bus');
+                stopIcon.classList.add('fa-train');
+                break;
+            case 'subway':
+                stopIcon.classList.remove('fa-bus');
+                stopIcon.classList.add('fa-subway');
+                break;
+            case 'ride':
+                stopIcon.classList.remove('fa-bus');
+                stopIcon.classList.add('fa-car');
+                break;
+            default:
+            // Keep the default bus icon
+        }
+    </script>
+</body>
+
+</html>
